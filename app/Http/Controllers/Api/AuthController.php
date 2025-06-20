@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Api;
+namespace App\Http\Controllers\Api;
 
 use App\ApiResponse;
 use App\Http\Requests\SignInRequest;
@@ -47,7 +47,7 @@ class AuthController
                 422
             );
         } catch (\Exception $e) {
-            Log::error('Login failed', ['error' => $e]);
+            logger('Login failed', ['error' => $e]);
             return $this->failure(
                 'Login failed'
             );
@@ -92,7 +92,8 @@ class AuthController
             );
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Registraiton failed', ['error' => $e]);
+            // Log::error('Registraiton failed', ['error' => $e]);
+            logger('Registraiton failed', ['error' => $e]);
             return $this->failure(
                 'Registration failed'
             );
