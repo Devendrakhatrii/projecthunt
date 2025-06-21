@@ -11,6 +11,7 @@ use App\Models\Notification;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Http\Request;
 
 class StoryController extends Controller
 {
@@ -107,6 +108,19 @@ class StoryController extends Controller
         } catch (\Exception $e) {
             $this->logError('Failed to delete story', $e, 'story.destroy');
             return $this->failure('Failed to delete story');
+        }
+    }
+
+    public function search(Request $request)
+    {
+        try {
+            $query = $request->input('search');
+            $projects = Story::search($query)->get();
+
+            return $this->success($projects, 'search successful');
+        } catch (\Exception $e) {
+            $this->logError('Failed to search stories', $e, 'story.search', $request);
+            return $this->failure('Failed to search stories');
         }
     }
 }

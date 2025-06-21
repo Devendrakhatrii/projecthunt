@@ -14,10 +14,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
+use App\LogResponse;
 
 class ProjectController extends Controller
 {
-    use ApiResponse;
+    use ApiResponse, LogResponse;
+
     /**
      * Display a listing of the resource.
      */
@@ -30,10 +32,8 @@ class ProjectController extends Controller
             }
             return $this->success($projects, 'project fetched succesfully');
         } catch (\Exception $e) {
-            Log::error('unable to fetch project', ['error' => $e]);
-            return $this->failure(
-                'Failed fetching project',
-            );
+            $this->logError('Failed to fetch projects', $e, 'project.index');
+            return $this->failure('Failed fetching project');
         }
     }
 
@@ -52,13 +52,11 @@ class ProjectController extends Controller
                 return $this->success($project, 'project added successfully');
             }
         } catch (ValidationException $e) {
-            logger()->error('validation failed', ['error' => $e]);
+            $this->logError('Validation failed', $e, 'project.store', $request);
             return $this->failure('validation failed', $e->errors(), 422);
         } catch (\Exception $e) {
-            logger()->error('Error createing project', ['error' => $e]);
-            return $this->failure(
-                'Failed creating project'
-            );
+            $this->logError('Error creating project', $e, 'project.store', $request);
+            return $this->failure('Failed creating project');
         }
     }
 
@@ -74,10 +72,8 @@ class ProjectController extends Controller
             }
             return $this->success($project, 'project fetched succesfully');
         } catch (\Exception $e) {
-            logger()->error('unable to fetch project', ['error' => $e]);
-            return $this->failure(
-                'Failed fetching project',
-            );
+            $this->logError('Failed to fetch project', $e, 'project.show');
+            return $this->failure('Failed fetching project');
         }
     }
 
@@ -103,28 +99,11 @@ class ProjectController extends Controller
                 'Project updated successfully'
             );
         } catch (ValidationException $e) {
-            logger()->error('Project validation failed', [
-                'project_id' => $id,
-                'user_id' => Auth::id(),
-                'errors' => $e->errors()
-            ]);
-
-            return $this->failure(
-                'Validation failed',
-                $e->errors(),
-                422
-            );
+            $this->logError('Project validation failed', $e, 'project.update', $request);
+            return $this->failure('Validation failed', $e->errors(), 422);
         } catch (\Exception $e) {
-            logger()->error('Failed to update project', [
-                'project_id' => $id,
-                'user_id' => Auth::id(),
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-
-            return $this->failure(
-                'Failed to update project'
-            );
+            $this->logError('Failed to update project', $e, 'project.update', $request);
+            return $this->failure('Failed to update project');
         }
     }
 
@@ -146,12 +125,11 @@ class ProjectController extends Controller
 
             return $this->success(null, 'Project deleted successfully');
         } catch (\Exception $e) {
-
-            logger()->error('Failed to delete project', ["error" => $e]);
-
+            $this->logError('Failed to delete project', $e, 'project.destroy');
             return $this->failure('Failed to delete project');
         }
     }
+
     public function upvote(string $id)
     {
         try {
@@ -165,6 +143,20 @@ class ProjectController extends Controller
         } catch (\Exception $e) {
             logger()->error(['error' => $e]);
             return $this->failure("couldn't upvote");
+        }
+    }
+
+
+    public function search(Request $request)
+    {
+        try {
+            $query = $request->input('search');
+            $projects = Project::search($query)->get();
+
+            return $this->success($projects, 'search successful');
+        } catch (\Exception $e) {
+            $this->logError('Failed to search projects', $e, 'project.search', $request);
+            return $this->failure('Failed to search projects');
         }
     }
 }

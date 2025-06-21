@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ProjectController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\BookmarkController;
+use App\Http\Controllers\Api\CommentController;
 use App\Http\Controllers\Api\StoryController;
 use App\Http\Controllers\Api\FollowController;
 use App\Http\Controllers\Api\NotificationController;
@@ -27,6 +28,10 @@ Route::get('/users', [UserController::class, 'index']);
 
 
 Route::middleware('auth:api')->group(function () {
+
+    Route::get('/projects/search', [ProjectController::class, 'search']);
+    Route::get('/stories/search', [StoryController::class, 'search']);
+
     Route::apiResource('projects', ProjectController::class);
 
     Route::apiResource('bookmarks', BookmarkController::class)->only(['index', 'store', 'destroy']);
@@ -43,4 +48,10 @@ Route::middleware('auth:api')->group(function () {
 
     Route::post('/upvote', [UpvoteController::class, 'toggleUpvote']);
     Route::get('upvotes/{type}/{id}', [UpvoteController::class, 'upvotes']);
+
+    Route::post('/comments', [CommentController::class, 'store']);               // create comment or reply
+    Route::get('/comments/{type}/{id}', [CommentController::class, 'index']);        // get comments for item
+    Route::get('/comments/replies/{comment}', [CommentController::class, 'loadReplies']); // lazy load replies
+
+
 });
