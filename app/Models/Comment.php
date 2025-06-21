@@ -2,10 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Comment extends Model
 {
+
+    use HasFactory;
+    
     protected $fillable = ['body', 'user_id', 'parent_id'];
 
     // Polymorphic relation to owning model (Project, Story, etc.)

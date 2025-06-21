@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\ApiResponse;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -11,7 +12,7 @@ use Laravel\Scout\Searchable;
 
 class Project extends Model
 {
-    use ApiResponse, Searchable;
+    use ApiResponse, Searchable, HasFactory;
 
     protected $fillable = [
         'user_id',
