@@ -24,3 +24,5 @@ frontend/.env
 Thumbs.db
 *.swp
 *.swo
+
+.env
