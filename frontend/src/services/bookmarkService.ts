@@ -2,6 +2,7 @@ import { toast } from "sonner";
 import axiosInstance from "@/lib/axiosInstance";
 
 type CreateBookmarkPayload = {
+  title?: string;
   project_id: number;
   bookmark_id?: number; // optional, if you want to specify a collection
 };
@@ -20,5 +21,3 @@ export async function getBookmarks() {
   const res = await axiosInstance.get("/bookmarks");
   return res.data.data;
 }
-
-

@@ -24,13 +24,22 @@ const techOptions = [
   "Python",
 ];
 
-const projectTypes = ["personal", "client", "open-source"];
+const projectTypes = ["personal", "client", "open-source"] as const;
+type ProjectType = (typeof projectTypes)[number];
 
 export default function CreateProjectPage() {
   const router = useRouter();
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    title: string;
+    tech_stack: string[];
+    description: string;
+    repo_url: string;
+    live_url: string;
+    project_type: ProjectType;
+    status: boolean;
+  }>({
     title: "",
-    tech_stack: [] as string[],
+    tech_stack: [],
     description: "",
     repo_url: "",
     live_url: "",
@@ -47,7 +56,7 @@ export default function CreateProjectPage() {
       // Prepare only the required payload for the API
       const payload = {
         title: formData.title,
-        tech_stack: formData.tech_stack, // <-- keep as array
+        tech_stack: formData.tech_stack,
         description: formData.description,
         repo_url: formData.repo_url,
         live_url: formData.live_url,
@@ -237,7 +246,7 @@ export default function CreateProjectPage() {
                     onChange={(e) =>
                       setFormData((prev) => ({
                         ...prev,
-                        project_type: e.target.value,
+                        project_type: e.target.value as ProjectType,
                       }))
                     }
                     className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm"

@@ -19,29 +19,26 @@ import { toast } from "sonner";
 import type { Project } from "@/types/Project";
 import { useAuth } from "@/context/authContext";
 
-const categories = [
-  "Design Tools",
-  "Developer Tools",
-  "Productivity",
-  "Analytics",
-  "Security",
-  "Marketing",
-  "AI/ML",
-  "Mobile Apps",
-  "Web Apps",
-  "SaaS",
-];
+type ProjectType = "personal" | "client" | "open-source" | undefined;
 
 export default function EditProjectPage() {
-  const params = useParams();
+  const params = useParams<{ id: string }>();
   const router = useRouter();
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    title: string;
+    description: string;
+    repo_url: string;
+    live_url: string;
+    tech_stack: string[];
+    project_type: ProjectType;
+    status: boolean;
+  }>({
     title: "",
     description: "",
     repo_url: "",
     live_url: "",
-    tech_stack: [] as string[],
-    project_type: "",
+    tech_stack: [],
+    project_type: undefined,
     status: true,
   });
   const [newTech, setNewTech] = useState("");
@@ -54,7 +51,7 @@ export default function EditProjectPage() {
   useEffect(() => {
     const fetchProject = async () => {
       setLoading(true);
-      const project = await getProject(params.id);
+      const project = await getProject(String(params.id));
       if (project) {
         if (project.user_id !== authUser?.id) {
           toast.error("You are not authorized to edit this project.");
@@ -74,20 +71,32 @@ export default function EditProjectPage() {
                 .split(",")
                 .map((t: string) => t.trim())
             : [],
-          project_type: project.project_type || "",
+          project_type:
+            typeof project.project_type === "string" &&
+            ["personal", "client", "open-source"].includes(project.project_type)
+              ? (project.project_type as ProjectType)
+              : undefined,
           status: project.status ?? true,
         });
       }
       setLoading(false);
     };
     fetchProject();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.id]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!params.id) {
+      toast.error("Project ID is missing.");
+      return;
+    }
     setIsSubmitting(true);
     try {
-      await updateProject(params.id, formData);
+      await updateProject(String(params.id), {
+        ...formData,
+        project_type: formData.project_type,
+      });
       toast.success("Project updated!");
       router.push(`/projects/${params.id}`);
     } catch {
@@ -105,9 +114,13 @@ export default function EditProjectPage() {
     ) {
       return;
     }
+    if (!params.id) {
+      toast.error("Project ID is missing.");
+      return;
+    }
     setIsDeleting(true);
     try {
-      await deleteProject(params.id);
+      await deleteProject(String(params.id));
       toast.success("Project deleted!");
       router.push("/");
     } catch {
@@ -287,11 +300,13 @@ export default function EditProjectPage() {
                     <Label htmlFor="project_type">Project Type</Label>
                     <select
                       id="project_type"
-                      value={formData.project_type}
+                      value={formData.project_type ?? ""}
                       onChange={(e) =>
                         setFormData((prev) => ({
                           ...prev,
-                          project_type: e.target.value,
+                          project_type: e.target.value
+                            ? (e.target.value as ProjectType)
+                            : undefined,
                         }))
                       }
                       className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm"

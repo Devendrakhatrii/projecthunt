@@ -1,6 +1,9 @@
 import axiosInstance from "@/lib/axiosInstance";
 
-export async function toggleUpvote(type: "project" | "story", id: number) {
+export async function toggleUpvote(
+  type: "project" | "story",
+  id: number | undefined
+) {
   const res = await axiosInstance.post("/upvote", { type, id });
   return res.data;
 }

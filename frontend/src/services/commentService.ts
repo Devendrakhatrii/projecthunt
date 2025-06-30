@@ -11,13 +11,13 @@ import { Comment } from "@/types/Comment";
 // }
 
 // commentService.ts
-export async function fetchComments(type: string, id: number) {
+export async function fetchComments(type: string, id: number | undefined) {
   const res = await axiosInstance.get(`/comments/${type}/${id}`);
   return res.data.data; // <-- Only return the array of comments
 }
 export async function postComment(
   type: "project" | "story",
-  id: number,
+  id: number | undefined,
   body: string,
   parent_id?: number
 ): Promise<Comment> {

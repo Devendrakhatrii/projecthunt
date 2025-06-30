@@ -11,7 +11,7 @@ import { RequireAuthAction } from "./requireAuthAction";
 
 type Props = {
   type: "project" | "story";
-  id: number;
+  id: number | undefined;
 };
 
 export function Comment({ type, id }: Props) {

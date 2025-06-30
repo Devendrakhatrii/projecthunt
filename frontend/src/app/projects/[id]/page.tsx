@@ -61,7 +61,7 @@ export default function ProjectDetailPage() {
 
   // Bookmark handler
   const handleBookmark = async () => {
-    if (!project) return;
+    if (!project || typeof project.id !== "number") return;
     try {
       await createBookmark({ title: "project", project_id: project.id });
       setBookmarked(true);
@@ -92,7 +92,7 @@ export default function ProjectDetailPage() {
 
   if (loading) return <div className="p-8 text-center">Loading...</div>;
 
-  if (!project || !user) return notFound();
+  if (!project) return notFound();
 
   // if (project.user_id !== user.id) return notFound();
 
@@ -267,11 +267,13 @@ export default function ProjectDetailPage() {
         </div>
       </div>
 
-      <BookmarkModal
-        open={bookmarkModalOpen}
-        onOpenChange={setBookmarkModalOpen}
-        projectId={project.id}
-      />
+      {typeof project.id === "number" && (
+        <BookmarkModal
+          open={bookmarkModalOpen}
+          onOpenChange={setBookmarkModalOpen}
+          projectId={project.id}
+        />
+      )}
     </>
   );
 }

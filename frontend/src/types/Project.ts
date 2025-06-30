@@ -10,7 +10,7 @@ export type Project = {
   repo_url: string | null;
   live_url: string | null;
   status: boolean;
-  project_type: "personal" | "client" | "open-source";
+  project_type?: "personal" | "client" | "open-source";
   created_at?: string;
   updated_at?: string;
   user?: User;
